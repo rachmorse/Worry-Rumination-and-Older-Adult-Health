@@ -14,7 +14,7 @@ Data_Summary <- read_excel("~/Documents/2021:2022/Marchant Lab/Data/MS Data.xlsx
                                     "numeric", "numeric", "numeric", 
                                     "numeric", "numeric", "numeric", 
                                     "numeric", "numeric"))
-View(MS_Data)
+View(Data_Summary)
 as.data.frame (Data_Summary)
 if (!require("psych")) {install.packages("psych"); require("psych")}
 if (!require("tidyverse")) {install.packages("tidyverse"); require("tidyverse")}
@@ -33,6 +33,7 @@ depresh <- (`Geriatric Depression Scale - Global`)
 edu <- (`Level of education`)
 frs <- (`Framingham`)
 cci <- (`Adjusted CCI`)
+cci_unadj <- (`Unadjusted CCI`)
 pacc <- (`PACC5 (STANDARDIZED with combined cohorts)`)
 paccscdage  <- (`PACC5 (for separate cohort analysis)`)
 cds <- (`Cognitive Difficulties Scale (CDS)`)
@@ -53,7 +54,7 @@ agewell <- slice(Data_Summary, 148:282)
 
 scdwell <- slice(Data_Summary, 1:147)
 
-#REMAINING AGEWELL AND SCDWELL VARS
+# REMAINING AGEWELL AND SCDWELL VARS ----
 attach(agewell)
 agewell$psw <- (`Penn State Worry`)
 agewell$rrsb <- (`Rumination Response Scale Brooding`)
@@ -97,7 +98,7 @@ scdwell$paccscdage <- (`PACC5 (for separate cohort analysis)`)
 scdwell$cds <- (`Cognitive Difficulties Scale (CDS)`)
 scdwell$pacc  <- (`PACC5 (STANDARDIZED with combined cohorts)`)
 
-##### Descriptive stats of demographic variables #####----
+# Descriptive stats of demographic variables #####----
 ## Library ##
 
 ## rrsb ##
@@ -264,8 +265,9 @@ wilcox.test(agewell$cds,scdwell$cds)
 ## pacc ##
 # descriptive stats for combined cohort in other script 
 attach(Data_Summary)
-hist(pacc)  # Create a histogram of the data
-shapiro.test(pacc)  # Perform a Shapiro-Wilk test of normality
+describe(pacc)
+hist(pacc)  
+shapiro.test(pacc)  
 
 attach(agewell)
 describe(agewell$paccscdage)
@@ -940,3 +942,36 @@ BPACC3 <- lm(scale(pacc) ~ scale(rrsb) + scale(age) + scale(sex) + scale(edu) + 
 summary(BPACC3) 
 confint(BPACC3)
 
+# Additional analyses with worry and rumination in the same model ----
+
+WRCDS1 <- lm(scale(cds) ~ scale(psw) + scale(rrsb) + scale(age) + scale(sex) + scale(edu) + scale(study), data = Data_Summary) 
+summary(WRCDS1) 
+confint(WRCDS1)
+
+WRWHOQOL1 <- lm(scale(whoqol) ~ scale(psw) + scale(rrsb) + scale(age) + scale(sex) + scale(edu) + scale(study), data = Data_Summary) 
+summary(WRWHOQOL1) 
+confint(WRWHOQOL1)
+
+# Correlation analyses ----
+if(!require(devtools)) install.packages("devtools")
+
+# correlation CCI
+corr_cci <- cor.test(cci,cci_unadj, method=("pearson"))
+conf_int_cci<- corr_cci$conf.int
+p_cci <- corr_cci$p.value
+
+cor.test(cci,cci_unadj, method=("pearson"))
+print(paste(conf_int_cci[1], "-", conf_int_cci[2]))
+print(paste(p_cci))  
+
+#ncorrelation worry & rumination
+corr_pswrrsb <- cor.test(psw,rrsb, method=("pearson"))
+conf_int_psw_rrsb<- corr_pswrrsb$conf.int
+p_psw_rrsb <- corr_pswrrsb$p.value
+
+cor.test(psw,rrsb, method=("pearson"))
+print(paste(conf_int_psw_rrsb[1], "-", conf_int_psw_rrsb[2]))
+print(paste(p_psw_rrsb))  
+
+  
+  

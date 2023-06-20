@@ -1,19 +1,16 @@
 
-if (!require("dplyr")) {install.packages("dplyr"); require("dplyr")}
-
 #### CREATING ADJUSTED FRS ####
+if (!require("tidyverse")) {install.packages("tidyverse"); require("tidyverse")}
+
 library(readxl)
 getwd()  
-setwd("Documents/2020:2021/Dissertation/Data")
+setwd("/Users/rachelmorse/Documents/2020:2021/Dissertation/Data")
 fr1 <- read_excel("Framingham Data.xlsx", 
                   sheet = "Data fr Adjusted", col_types = c("text", 
                                                             "numeric", "numeric", "numeric", 
                                                             "numeric", "numeric", "numeric", "numeric", 
                                                             "numeric"))
 attach(fr1)
-
-fr1 <- data.frame(fr1)
-
 fr1 <- fr1 %>% 
   #age points
   filter(!is.na(Age)) %>% 
@@ -143,43 +140,34 @@ fr2 <- fr2 %>%
   
   mutate(frs2 = agefr2 + chfr2 + hdlfr2 + smokefr2 + sbpfr2) 
 
-write.csv(fr2,"~/Documents/2020:2021/Dissertation/Data/Framingham Data\\Unadjusted FRS Data.csv", row.names = FALSE)
-
-#### DESCRIBING & COMPARING FRS ADJ & UNADJ ####
 
 if (!require("psych")) {install.packages("psych"); require("psych")}
-if (!require("ggpubr")) {install.packages("ggpubr"); require("ggpubr")}
 
-## frs1 ##
+## frs adjusted ##
 frs1 <- (fr1$frs1)
 describe(frs1)
-shapiro.test(frs1) # positive skew
-ggdensity(frs1, fill = "lightpink")
 
 agewellfrs <- slice(Data_Summary1, 1:113)
-attach(agewellfrs)
-as.data.frame (agewellfrs)
-describe(agewellfrs$frs1)
 
 scdwellfrs <- slice(Data_Summary1, 114:260)
-attach(scdwellfrs)
-as.data.frame (scdwellfrs)
-describe(scdwellfrs$frs1)
 
-wilcox.test(scdwellfrs$frs1,agewellfrs$frs1)
-
-## frs2 ##
+## frs unajdusted ##
 frs2 <- (fr2$frs2)
 describe(frs2)
-shapiro.test(frs2) # positive skew
-ggdensity(frs2, fill = "lightpink")
 
 framingham <- merge(fr2,fr1,by="ID")
 attach(framingham)
 
-# adjusted vs unadjusted ---
-plot(framingham$frs1,framingham$frs2) 
-a <- lm(framingham$frs2 ~ framingham$frs1, data = Data_Summary) 
-abline(a$coef[1], a$coef[2], col = "red", lwd = 3) 
-summary(a) 
+
+### CORRELATION FRS ADJ & UNADJ 
+if(!require(devtools)) install.packages("devtools")
+
+corr_fr <- cor.test(framingham$fr2,framingham$fr1, method=("pearson"))
+conf_int_fr <- corr_fr$conf.int
+p_fr <- corr_fr$p.value
+
+cor.test(framingham$fr2,framingham$fr1, method=("pearson"))
+print(paste(conf_int_fr[1], "-", conf_int_fr[2]))
+print(paste(p_fr))
+
 
