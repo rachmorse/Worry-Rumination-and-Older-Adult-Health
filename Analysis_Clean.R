@@ -1,20 +1,16 @@
 # Load packages
 if (!requireNamespace("psych", quietly = TRUE)) install.packages("psych"); library(psych)
 if (!requireNamespace("tidyverse", quietly = TRUE)) install.packages("tidyverse"); library(tidyverse)
+library(readxl)
 
 # Read in data ----
-getwd()
-setwd("Users/rachelmorse/Documents/2021:2022/Marchant Lab/Data")
-library(readxl)
 data <- read_excel("~/Documents/2021:2022/Marchant Lab/Data/MS Data.xlsx",
   col_types = c(
     "text",
     rep("numeric", 19),
     "text", "numeric",
     rep("text", 2),
-    rep("numeric", 10)
-  )
-)
+    rep("numeric", 10)))
 
 ##################################
 # Clean the data for analysis ----
@@ -1037,4 +1033,3 @@ confint(unadj_cci_psw1)
 unadj_cci_psw2 <- lm(scale(cci_unadj) ~ scale(psw) + scale(sex) + scale(edu), data = data)
 summary(unadj_cci_psw2)
 confint(unadj_cci_psw2)
-
