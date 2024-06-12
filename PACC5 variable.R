@@ -26,12 +26,15 @@ data <- read_excel("~/Documents/2021:2022/Marchant Lab/Data/MS Data.xlsx",
 )
 
 # Divide the data by cohort 
-ageonlypacc <- slice(data, 148:284)
-scdonlypacc <- slice(data, 1:147)
+ageonlypacc <- data %>%
+  filter(study == 2)
 
-###################################################################
+scdonlypacc <- data %>%
+  filter(study == 1)
+
+################################################################
 ## Creating adjusted PACC scores for combined cohort analysis ##
-###################################################################
+################################################################
 
 # Rename CVLT in Age-Well 
 ageonlypacc <- ageonlypacc %>% 
@@ -46,7 +49,7 @@ ageonlypacc <- ageonlypacc %>%
 scdonlypacc <- scdonlypacc %>% 
   rename(ravlt = `ravlt OR cvlt (in Age-Well) this column can only be use for separate cohort analyses`)
 
-# Then create a new variable cvlt-ravlt to be able to compare cohorts
+# Then create a new variable cvlt_ravlt to be able to compare cohorts
 scdonlypacc$cvlt_ravlt <- scdonlypacc$ravlt
 
 # Subset the df to needed columns and merge the cohorts 
@@ -59,7 +62,7 @@ merged_df <- merged_df %>%
 
 merged_df <- merged_df[complete.cases(merged_df[columns_for_analysis]), ] # Remove NAs
 
-## Standardise components (create z-scores) ##
+## Standardize components (create z-scores) ##
 cols_to_scale <- c("zdrs" = "drs", "zcvlt_ravlt" = "cvlt_ravlt", "zfluency" = "fluency", "zcoding" = "coding") # New names are labeled with z
 
 merged_df <- merged_df %>%
@@ -72,9 +75,9 @@ merged_df <- merged_df %>%
     zpacc5 = scale(pacc5) # Scale the PACC variable
   )  
 
-###########################################
-## Creating adjusted PACC scores for SCD ##
-###########################################
+################################################
+## Creating adjusted PACC scores for SCD-Well ##
+################################################
 
 ## Standardise components (create z-scores) ##
 cols_to_scale_scd <- c("zdrs" = "drs", "zravlt" = "ravlt", "zfluency" = "fluency", "zcoding" = "coding") # New names are labeled with z
@@ -95,7 +98,7 @@ scdonlypacc <- scdonlypacc %>%
 # Note that this is a 5 component (with logical mem) PACC whereas the others are adjusted as they only include 4 components
 
 # Rename variables
-ageonlypacc$log <- (`logical mem`)
+ageonlypacc$log <- ageonlypacc$`logical mem`
 
 ## Standardise components (create z-scores) ##
 cols_to_scale_age <- c("zdrs" = "drs", "zcvlt" = "cvlt", "zfluency" = "fluency", "zcoding" = "coding", "zlog" = "log") # New names are labeled with z
