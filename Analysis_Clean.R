@@ -1,7 +1,7 @@
 # Load packages
-if (!requireNamespace("psych", quietly = TRUE)) install.packages("psych"); library(psych)
-if (!requireNamespace("tidyverse", quietly = TRUE)) install.packages("tidyverse"); library(tidyverse)
-library(cowplot)
+if (!requireNamespace("psych", quietly = TRUE)) install.packages("psych"); library("psych")
+if (!requireNamespace("tidyverse", quietly = TRUE)) install.packages("tidyverse"); library("tidyverse")
+if (!requireNamespace("cowplot", quietly = TRUE)) install.packages("cowplot"); library("cowplot")
 library(readxl)
 
 # Read in data ----
