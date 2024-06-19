@@ -1,6 +1,7 @@
 # Load packages
 if (!requireNamespace("psych", quietly = TRUE)) install.packages("psych"); library(psych)
 if (!requireNamespace("tidyverse", quietly = TRUE)) install.packages("tidyverse"); library(tidyverse)
+library(cowplot)
 library(readxl)
 
 # Read in data ----
@@ -1033,3 +1034,37 @@ confint(unadj_cci_psw1)
 unadj_cci_psw2 <- lm(scale(cci_unadj) ~ scale(psw) + scale(sex) + scale(edu), data = data)
 summary(unadj_cci_psw2)
 confint(unadj_cci_psw2)
+
+###########################################################
+# Figures for subjective physical and cognitive health ----
+###########################################################
+
+# Define a function to create the plots
+create_plot <- function(x, y, x_label, y_label) {
+  ggplot(data, aes(x = x, y = y)) +
+    geom_point(size = 2.5) +  
+    geom_smooth(method = "lm", se = TRUE, 
+                color = "#86B6F6", 
+                fill = "#B4D4FF") +  
+    labs(x = x_label, y = y_label) +
+    theme_minimal() +
+    theme(plot.margin = unit(c(0.35, 0.35, 0.35, 0.35), "cm")) 
+}
+
+# Create the plots
+p1 <- create_plot(data$psw, data$whoqol, "Worry", "Subjective Physical Health")
+p2 <- create_plot(data$rrsb, data$whoqol, "Ruminative Brooding", "Subjective Physical Health")
+p3 <- create_plot(data$psw, data$cds, "Worry", "Subjective Cognitive Difficulties")
+p4 <- create_plot(data$rrsb, data$cds, "Ruminative Brooding", "Subjective Cognitive Difficulties")
+
+# Combine the plots into one figure
+combined_physical_plot <- plot_grid(p1, p2, ncol = 1) 
+combined_physical_plot # View plot
+
+combined_cognitive_plot <- plot_grid(p3, p4, ncol = 1) 
+combined_cognitive_plot # View plot
+
+# Save the plots
+ggsave("Fig 1.jpeg", plot = combined_physical_plot, width = 6, height = 8, dpi = 400, units = "in")
+ggsave("Fig 2.jpeg", plot = combined_cognitive_plot, width = 6, height = 8, dpi = 400, units = "in")
+
